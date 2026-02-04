@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Pressable, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, Image, Pressable, Dimensions } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 

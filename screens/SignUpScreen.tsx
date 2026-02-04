@@ -10,16 +10,16 @@ import AuthDivider from '../components/auth/AuthDivider';
 import GoogleButton from '../components/auth/GoogleButton';
 import { AUTH_COLORS } from '../components/auth/colors';
 
+import { register, PublicUser } from '../services/auth';
+
 export default function SignUpScreen({
   onBack,
-  onSignUp,
-  onGoogle,
+  onSignedUp,
   onGoSignIn,
   onTerms,
 }: {
   onBack?: () => void;
-  onSignUp?: (data: { name: string; email: string; password: string; agreed: boolean }) => void;
-  onGoogle?: () => void;
+  onSignedUp?: (user: PublicUser) => void;
   onGoSignIn?: () => void;
   onTerms?: () => void;
 }) {
@@ -28,6 +28,22 @@ export default function SignUpScreen({
   const [password, setPassword] = useState('');
   const [pwHidden, setPwHidden] = useState(true);
   const [agreed, setAgreed] = useState(true);
+  const [err, setErr] = useState<string>('');
+  const [busy, setBusy] = useState(false);
+
+  async function handleSignUp() {
+    try {
+      setErr('');
+      if (!agreed) throw new Error('You must agree with Terms & Privacy');
+      setBusy(true);
+      const user = await register({ name, email, password });
+      onSignedUp?.(user);
+    } catch (e: any) {
+      setErr(e?.message || 'Failed to sign up');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -91,19 +107,22 @@ export default function SignUpScreen({
           </Text>
         </Pressable>
 
+        {err ? (
+          <Text className="mt-3 text-[13px] font-medium" style={{ color: '#D13B3B' }}>
+            {err}
+          </Text>
+        ) : null}
+
         <View className="mt-6">
-          <AuthPrimaryButton
-            title="Sign Up"
-            onPress={() => onSignUp?.({ name, email, password, agreed })}
-          />
+          <AuthPrimaryButton title={busy ? 'Signing Up...' : 'Sign Up'} onPress={handleSignUp} />
         </View>
 
         <View className="mt-10">
           <AuthDivider text="Or sign up with" />
         </View>
 
-        <View className="mt-8">
-          <GoogleButton onPress={onGoogle} />
+        <View className="mt-8 opacity-50">
+          <GoogleButton onPress={() => {}} />
         </View>
 
         <View className="mt-10 items-center">

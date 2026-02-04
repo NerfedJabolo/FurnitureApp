@@ -10,20 +10,35 @@ import AuthDivider from '../components/auth/AuthDivider';
 import GoogleButton from '../components/auth/GoogleButton';
 import { AUTH_COLORS } from '../components/auth/colors';
 
+import { login, PublicUser } from '../services/auth';
+
 export default function SignInScreen({
   onBack,
-  onSignIn,
-  onGoogle,
+  onSignedIn,
   onGoSignUp,
 }: {
   onBack?: () => void;
-  onSignIn?: (data: { email: string; password: string }) => void;
-  onGoogle?: () => void;
+  onSignedIn?: (user: PublicUser) => void;
   onGoSignUp?: () => void;
 }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pwHidden, setPwHidden] = useState(true);
+  const [err, setErr] = useState<string>('');
+  const [busy, setBusy] = useState(false);
+
+  async function handleSignIn() {
+    try {
+      setErr('');
+      setBusy(true);
+      const user = await login({ email, password });
+      onSignedIn?.(user);
+    } catch (e: any) {
+      setErr(e?.message || 'Failed to sign in');
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -55,18 +70,24 @@ export default function SignInScreen({
               </Pressable>
             }
           />
+
+          {err ? (
+            <Text className="text-[13px] font-medium" style={{ color: '#D13B3B' }}>
+              {err}
+            </Text>
+          ) : null}
         </View>
 
         <View className="mt-10">
-          <AuthPrimaryButton title="Sign In" onPress={() => onSignIn?.({ email, password })} />
+          <AuthPrimaryButton title={busy ? 'Signing In...' : 'Sign In'} onPress={handleSignIn} />
         </View>
 
         <View className="mt-10">
           <AuthDivider text="Or sign in with" />
         </View>
 
-        <View className="mt-8">
-          <GoogleButton onPress={onGoogle} />
+        <View className="mt-8 opacity-50">
+          <GoogleButton onPress={() => {}} />
         </View>
 
         <View className="mt-10 items-center">
