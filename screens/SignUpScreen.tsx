@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { AuthStackParamList } from '../navigation/types';
+import { useAuthGate } from '../services/authGate';
+import { register } from '../services/auth';
 
 import AuthHeader from '../components/auth/AuthHeader';
 import AuthField from '../components/auth/AuthField';
@@ -9,25 +13,21 @@ import AuthPrimaryButton from '../components/auth/AuthPrimaryButton';
 import AuthDivider from '../components/auth/AuthDivider';
 import GoogleButton from '../components/auth/GoogleButton';
 import { AUTH_COLORS } from '../components/auth/colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { register, PublicUser } from '../services/auth';
+type Props = NativeStackScreenProps<AuthStackParamList, 'SignUp'>;
 
-export default function SignUpScreen({
-  onBack,
-  onSignedUp,
-  onGoSignIn,
-  onTerms,
-}: {
-  onBack?: () => void;
-  onSignedUp?: (user: PublicUser) => void;
-  onGoSignIn?: () => void;
-  onTerms?: () => void;
-}) {
+export default function SignUpScreen({ navigation }: Props) {
+  const { setUser } = useAuthGate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pwHidden, setPwHidden] = useState(true);
+
+  // screenshot shows checked by default
   const [agreed, setAgreed] = useState(true);
+
   const [err, setErr] = useState<string>('');
   const [busy, setBusy] = useState(false);
 
@@ -35,9 +35,10 @@ export default function SignUpScreen({
     try {
       setErr('');
       if (!agreed) throw new Error('You must agree with Terms & Privacy');
+
       setBusy(true);
       const user = await register({ name, email, password });
-      onSignedUp?.(user);
+      setUser(user); // ✅ RootNavigator swaps Auth -> App
     } catch (e: any) {
       setErr(e?.message || 'Failed to sign up');
     } finally {
@@ -48,7 +49,7 @@ export default function SignUpScreen({
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 px-6 pt-4">
-        <AuthHeader title="Sign Up" onBack={onBack} />
+        <AuthHeader title="Sign Up" onBack={() => navigation.goBack()} />
 
         <View className="mt-10 space-y-6">
           <AuthField
@@ -101,7 +102,11 @@ export default function SignUpScreen({
 
           <Text style={{ color: AUTH_COLORS.primary }} className="ml-3 text-[14px]">
             I agree with{' '}
-            <Text onPress={onTerms} className="font-semibold">
+            <Text
+              onPress={() => {
+                // hook for later
+              }}
+              className="font-semibold">
               Terms &amp; Privacy
             </Text>
           </Text>
@@ -121,6 +126,7 @@ export default function SignUpScreen({
           <AuthDivider text="Or sign up with" />
         </View>
 
+        {/* visually present but disabled */}
         <View className="mt-8 opacity-50">
           <GoogleButton onPress={() => {}} />
         </View>
@@ -128,7 +134,7 @@ export default function SignUpScreen({
         <View className="mt-10 items-center">
           <Text style={{ color: AUTH_COLORS.primary }} className="text-[14px]">
             Already have an account?{' '}
-            <Text onPress={onGoSignIn} className="font-semibold underline">
+            <Text onPress={() => navigation.navigate('SignIn')} className="font-semibold underline">
               Sign In
             </Text>
           </Text>

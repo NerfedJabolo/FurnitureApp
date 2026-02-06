@@ -84,8 +84,6 @@ export async function register(params: {
 
   await setSession({ userId: user.id, createdAt: Date.now() });
 
-  // return public
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _pw, ...publicUser } = user;
   return publicUser;
 }
@@ -104,8 +102,6 @@ export async function login(params: { email: string; password: string }): Promis
   if (user.password !== password) throw new Error('Incorrect password');
 
   await setSession({ userId: user.id, createdAt: Date.now() });
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _pw, ...publicUser } = user;
   return publicUser;
 }
@@ -123,7 +119,6 @@ export async function getCurrentUser(): Promise<PublicUser | null> {
   const user = users.find((u) => u.id === session.userId);
   if (!user) return null;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password: _pw, ...publicUser } = user;
   return publicUser;
 }

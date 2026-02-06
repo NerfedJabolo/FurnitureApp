@@ -1,16 +1,14 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AuthStackParamList } from 'navigation/types';
 import React from 'react';
 import { View, Text, Image, Pressable, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-export default function SplashScreen({
-  onSignUp,
-  onSignIn,
-}: {
-  onSignUp?: () => void;
-  onSignIn?: () => void;
-}) {
+type Props = NativeStackScreenProps<AuthStackParamList, 'Splash'>;
+
+export default function SplashScreen({ navigation }: Props) {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 items-center justify-center px-6">
@@ -39,12 +37,12 @@ export default function SplashScreen({
         {/* Button + link */}
         <View className="mt-10 w-full">
           <Pressable
-            onPress={onSignUp}
+            onPress={() => navigation.navigate('SignUp')}
             className="h-14 w-full items-center justify-center rounded-2xl bg-[#4F63B6]">
             <Text className="text-[16px] font-semibold text-white">Sign Up</Text>
           </Pressable>
 
-          <Pressable onPress={onSignIn} className="mt-6 items-center">
+          <Pressable onPress={() => navigation.navigate('SignIn')} className="mt-6 items-center">
             <Text className="text-[14px] font-semibold text-[#4F63B6]">Sign In</Text>
           </Pressable>
         </View>

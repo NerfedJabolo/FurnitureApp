@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Image, Pressable, FlatList, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+const COFFEE_CHAIR = require('../assets/coffee-chair.png');
 
 const COLORS = {
   primary: '#4F63B6',
@@ -22,7 +23,7 @@ type Product = {
   id: string;
   title: string;
   price: number;
-  imageUri: string;
+  image: any;
 };
 
 const CATEGORIES: Category[] = [
@@ -39,29 +40,25 @@ const PRODUCTS: Product[] = [
     id: '1',
     title: 'Black Simple Lamp',
     price: 12,
-    imageUri:
-      'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80',
+    image: COFFEE_CHAIR,
   },
   {
     id: '2',
     title: 'Minimal Stand',
     price: 25,
-    imageUri:
-      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=800&q=80',
+    image: COFFEE_CHAIR,
   },
   {
     id: '3',
     title: 'Coffee Chair',
     price: 20,
-    imageUri:
-      'https://images.unsplash.com/photo-1519710887728-7d66f7a21f85?auto=format&fit=crop&w=800&q=80',
+    image: COFFEE_CHAIR,
   },
   {
     id: '4',
     title: 'Simple Desk',
     price: 50,
-    imageUri:
-      'https://images.unsplash.com/photo-1505693314120-0d443867891c?auto=format&fit=crop&w=800&q=80',
+    image: COFFEE_CHAIR,
   },
 ];
 
@@ -108,7 +105,7 @@ function ProductCard({
   return (
     <Pressable onPress={onPress} style={{ width: cardWidth }} className="mb-10">
       <View className="overflow-hidden rounded-3xl" style={{ backgroundColor: COLORS.cardBg }}>
-        <Image source={{ uri: item.imageUri }} className="h-56 w-full" resizeMode="cover" />
+        <Image source={item.image} className="h-56 w-full" resizeMode="cover" />
       </View>
 
       <Text className="mt-4 text-[20px] font-medium" style={{ color: COLORS.muted }}>
@@ -122,45 +119,15 @@ function ProductCard({
   );
 }
 
-function BottomTabBar({
-  active,
-  onTab,
-}: {
-  active: 'home' | 'bookmark' | 'profile';
-  onTab?: (t: 'home' | 'bookmark' | 'profile') => void;
-}) {
-  const iconColor = (t: typeof active) => (t === active ? COLORS.primary : '#9B9B9B');
-
-  return (
-    <View className="px-10 pb-6 pt-4">
-      <View className="flex-row items-center justify-between">
-        <Pressable onPress={() => onTab?.('home')} hitSlop={12}>
-          <Ionicons name="home-outline" size={34} color={iconColor('home')} />
-        </Pressable>
-
-        <Pressable onPress={() => onTab?.('bookmark')} hitSlop={12}>
-          <Ionicons name="bookmark-outline" size={30} color={iconColor('bookmark')} />
-        </Pressable>
-
-        <Pressable onPress={() => onTab?.('profile')} hitSlop={12}>
-          <Ionicons name="person-outline" size={30} color={iconColor('profile')} />
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
 export default function HomeScreen({
   onSearch,
   onProduct,
-  onTab,
 }: {
   onSearch?: () => void;
   onProduct?: (id: string) => void;
   onTab?: (t: 'home' | 'bookmark' | 'profile') => void;
 }) {
   const [activeCat, setActiveCat] = useState('popular');
-  const [activeTab] = useState<'home' | 'bookmark' | 'profile'>('home');
 
   const data = useMemo(() => {
     return PRODUCTS;
@@ -211,11 +178,6 @@ export default function HomeScreen({
           )}
           contentContainerStyle={{ paddingBottom: 110 }}
         />
-      </View>
-
-      {/* Bottom tabs */}
-      <View className="absolute bottom-0 left-0 right-0 bg-white">
-        <BottomTabBar active={activeTab} onTab={onTab} />
       </View>
     </SafeAreaView>
   );
