@@ -7,7 +7,7 @@ import { RootStackParamList } from './types';
 import { useAuthGate } from '../services/authGate';
 
 import AuthStackNavigator from './auth/AuthStackNavigator';
-import AppTabsNavigator from './app/AppTabsNavigator';
+import AppStackNavigator from './app/AppStackNavigator';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,7 +26,7 @@ export default function RootNavigator() {
     <NavigationContainer>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <RootStack.Screen name="App" component={AppTabsNavigator} />
+          <RootStack.Screen name="App" component={AppStackNavigator} />
         ) : (
           <RootStack.Screen name="Auth" component={AuthStackNavigator} />
         )}

@@ -10,6 +10,11 @@ export type AppTabParamList = {
   Profile: undefined;
 };
 
+export type AppStackParamList = {
+  Tabs: undefined;
+  Product: { productId?: string } | undefined;
+};
+
 export type RootStackParamList = {
   Auth: undefined;
   App: undefined;

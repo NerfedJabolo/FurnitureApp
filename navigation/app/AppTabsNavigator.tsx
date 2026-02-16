@@ -1,8 +1,10 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppTabParamList } from '../types';
+import { AppStackParamList, AppTabParamList } from '../types';
 import HomeScreen from '../../screens/HomeScreen';
 import FavoritesScreen from '../../screens/FavoritesScreen';
 import ProfileScreen from '../../screens/ProfileScreen';
@@ -15,6 +17,8 @@ const COLORS = {
 };
 
 export default function AppTabsNavigator() {
+  const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -30,7 +34,9 @@ export default function AppTabsNavigator() {
           return <Ionicons name="person-outline" size={30} color={color} />;
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Home">
+        {() => <HomeScreen onProduct={(productId) => navigation.navigate('Product', { productId })} />}
+      </Tab.Screen>
       <Tab.Screen name="Favorites" component={FavoritesScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
