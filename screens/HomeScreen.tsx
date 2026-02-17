@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, Image, Pressable, FlatList, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-const COFFEE_CHAIR = require('../assets/coffee-chair.png');
+import { PRODUCTS, Product } from '../data/products';
 
 const COLORS = {
   primary: '#4F63B6',
@@ -19,13 +19,6 @@ type Category = {
   icon: keyof typeof Ionicons.glyphMap;
 };
 
-type Product = {
-  id: string;
-  title: string;
-  price: number;
-  image: any;
-};
-
 const CATEGORIES: Category[] = [
   { key: 'popular', label: 'Popular', icon: 'star' },
   { key: 'chair', label: 'Chair', icon: 'cafe-outline' },
@@ -33,33 +26,6 @@ const CATEGORIES: Category[] = [
   { key: 'armchair', label: 'Armchair', icon: 'person-outline' },
   { key: 'bed', label: 'Bed', icon: 'bed-outline' },
   { key: 'lamp', label: 'Lamp', icon: 'bulb-outline' },
-];
-
-const PRODUCTS: Product[] = [
-  {
-    id: '1',
-    title: 'Black Simple Lamp',
-    price: 12,
-    image: COFFEE_CHAIR,
-  },
-  {
-    id: '2',
-    title: 'Minimal Stand',
-    price: 25,
-    image: COFFEE_CHAIR,
-  },
-  {
-    id: '3',
-    title: 'Coffee Chair',
-    price: 20,
-    image: COFFEE_CHAIR,
-  },
-  {
-    id: '4',
-    title: 'Simple Desk',
-    price: 50,
-    image: COFFEE_CHAIR,
-  },
 ];
 
 function CategoryPill({
