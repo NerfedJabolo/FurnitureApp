@@ -5,9 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { PRODUCTS } from '../data/products';
+import { SEED_PRODUCTS } from '../data/products';
 import { useFavoritesGate } from '../services/favoritesGate';
 import { AppStackParamList } from '../navigation/types';
+import { useCatalogGate } from '../services/catalogGate';
 
 const COLORS = {
   bg: '#F7F7F7',
@@ -21,12 +22,14 @@ const COLORS = {
 export default function FavoritesScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
   const { booting, favoriteIds, removeFavorite } = useFavoritesGate();
+  const { products } = useCatalogGate();
+  const sourceProducts = products.length ? products : SEED_PRODUCTS;
 
   const items = useMemo(() => {
     return favoriteIds
-      .map((id) => PRODUCTS.find((product) => product.id === id))
-      .filter((product): product is (typeof PRODUCTS)[number] => Boolean(product));
-  }, [favoriteIds]);
+      .map((id) => sourceProducts.find((product) => product.id === id))
+      .filter((product): product is (typeof sourceProducts)[number] => Boolean(product));
+  }, [favoriteIds, sourceProducts]);
 
   if (booting) {
     return (
@@ -66,7 +69,11 @@ export default function FavoritesScreen() {
               <Pressable
                 onPress={() => navigation.navigate('Product', { productId: item.id })}
                 className="mr-4 h-24 w-24 overflow-hidden rounded-2xl">
-                <Image source={item.image} className="h-full w-full" resizeMode="cover" />
+                <Image
+                  source={typeof item.image === 'string' ? { uri: item.image } : item.image}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
               </Pressable>
 
               <Pressable

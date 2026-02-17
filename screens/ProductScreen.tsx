@@ -5,8 +5,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppStackParamList } from '../navigation/types';
-import { PRODUCTS } from '../data/products';
+import { SEED_PRODUCTS } from '../data/products';
 import { useFavoritesGate } from '../services/favoritesGate';
+import { useCatalogGate } from '../services/catalogGate';
 
 type Props = NativeStackScreenProps<AppStackParamList, 'Product'>;
 
@@ -25,8 +26,12 @@ export default function ProductScreen({ navigation, route }: Props) {
   const { height } = useWindowDimensions();
   const compact = height < 760;
   const { isFavorite, toggleFavorite } = useFavoritesGate();
-  const product = PRODUCTS.find((item) => item.id === route.params?.productId) ?? PRODUCTS[0];
+  const { products } = useCatalogGate();
+  const sourceProducts = products.length ? products : SEED_PRODUCTS;
+  const product =
+    sourceProducts.find((item) => item.id === route.params?.productId) ?? sourceProducts[0];
   const productIsFavorite = isFavorite(product.id);
+  const imageSource = typeof product.image === 'string' ? { uri: product.image } : product.image;
 
   const heroHeightPercent = compact ? '46%' : '50%';
   const titleSize = compact ? 28 : 32;
@@ -41,7 +46,7 @@ export default function ProductScreen({ navigation, route }: Props) {
     <SafeAreaView edges={['top']} className="flex-1" style={{ backgroundColor: COLORS.bg }}>
       <View className="flex-1">
         <View style={{ height: heroHeightPercent }}>
-          <Image source={product.image} resizeMode="cover" className="h-full w-full" />
+          <Image source={imageSource} resizeMode="cover" className="h-full w-full" />
 
           <View className="absolute left-6 top-4">
             <Pressable

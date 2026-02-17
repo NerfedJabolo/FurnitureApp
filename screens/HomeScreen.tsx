@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Image, Pressable, FlatList, Dimensions } from 'react-native';
+import { View, Text, Image, Pressable, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PRODUCTS, Product } from '../data/products';
+import { CategoryKey, Product } from '../data/products';
+import { useCatalogGate } from '../services/catalogGate';
 
 const COLORS = {
   primary: '#4F63B6',
@@ -14,7 +15,7 @@ const COLORS = {
 };
 
 type Category = {
-  key: string;
+  key: CategoryKey;
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
 };
@@ -68,10 +69,12 @@ function ProductCard({
   cardWidth: number;
   onPress?: () => void;
 }) {
+  const imageSource = typeof item.image === 'string' ? { uri: item.image } : item.image;
+
   return (
     <Pressable onPress={onPress} style={{ width: cardWidth }} className="mb-10">
       <View className="overflow-hidden rounded-3xl" style={{ backgroundColor: COLORS.cardBg }}>
-        <Image source={item.image} className="h-56 w-full" resizeMode="cover" />
+        <Image source={imageSource} className="h-56 w-full" resizeMode="cover" />
       </View>
 
       <Text className="mt-4 text-[20px] font-medium" style={{ color: COLORS.muted }}>
@@ -93,11 +96,13 @@ export default function HomeScreen({
   onProduct?: (id: string) => void;
   onTab?: (t: 'home' | 'bookmark' | 'profile') => void;
 }) {
-  const [activeCat, setActiveCat] = useState('popular');
+  const { booting, products } = useCatalogGate();
+  const [activeCat, setActiveCat] = useState<CategoryKey>('popular');
 
   const data = useMemo(() => {
-    return PRODUCTS;
-  }, []);
+    if (activeCat === 'popular') return products;
+    return products.filter((item) => item.category === activeCat);
+  }, [activeCat, products]);
 
   const screenW = Dimensions.get('window').width;
   const gap = 18;
@@ -133,12 +138,24 @@ export default function HomeScreen({
 
       {/* Product grid */}
       <View className="flex-1 px-6 pt-10">
+        {booting ? (
+          <View className="flex-1 items-center justify-center">
+            <ActivityIndicator />
+          </View>
+        ) : null}
         <FlatList
           data={data}
           keyExtractor={(i) => i.id}
           numColumns={2}
           columnWrapperStyle={{ justifyContent: 'space-between' }}
           showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View className="pt-12">
+              <Text className="text-center text-[16px]" style={{ color: COLORS.muted }}>
+                No items available for this category.
+              </Text>
+            </View>
+          }
           renderItem={({ item }) => (
             <ProductCard item={item} cardWidth={cardWidth} onPress={() => onProduct?.(item.id)} />
           )}

@@ -13,6 +13,7 @@ export type AppTabParamList = {
 export type AppStackParamList = {
   Tabs: undefined;
   Product: { productId?: string } | undefined;
+  CreateListing: undefined;
 };
 
 export type RootStackParamList = {
