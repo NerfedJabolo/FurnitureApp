@@ -15,9 +15,18 @@ const COLORS = {
   card: '#FFFFFF',
 };
 
-function MenuCard({ title, subtitle }: { title: string; subtitle: string }) {
+function MenuCard({
+  title,
+  subtitle,
+  onPress,
+}: {
+  title: string;
+  subtitle: string;
+  onPress?: () => void;
+}) {
   return (
     <Pressable
+      onPress={onPress}
       className="h-[74px] flex-row items-center justify-between px-4"
       style={{ backgroundColor: COLORS.card }}>
       <View>
@@ -34,7 +43,7 @@ function MenuCard({ title, subtitle }: { title: string; subtitle: string }) {
 }
 
 export default function ProfileScreen() {
-  const { user } = useAuthGate();
+  const { user, signOut } = useAuthGate();
   const navigation = useNavigation<NativeStackNavigationProp<AppStackParamList>>();
 
   return (
@@ -44,7 +53,9 @@ export default function ProfileScreen() {
           <Text className="text-[32px] font-semibold" style={{ color: COLORS.text }}>
             Profile
           </Text>
-          <Pressable className="absolute right-0 h-10 w-10 items-center justify-center">
+          <Pressable
+            onPress={() => signOut()}
+            className="absolute right-0 h-10 w-10 items-center justify-center">
             <Ionicons name="log-out-outline" size={24} color={COLORS.primary} />
           </Pressable>
         </View>
@@ -63,7 +74,11 @@ export default function ProfileScreen() {
         </View>
 
         <View className="mt-5">
-          <MenuCard title="Settings" subtitle="Account, FAQ, Contact" />
+          <MenuCard
+            title="Settings"
+            subtitle="Account, FAQ, Contact"
+            onPress={() => navigation.navigate('Settings')}
+          />
         </View>
 
         <View className="mt-auto pb-3">

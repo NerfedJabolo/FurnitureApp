@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, Image, Pressable, FlatList, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, Image, Pressable, FlatList, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CategoryKey, Product } from '../data/products';
@@ -98,11 +98,17 @@ export default function HomeScreen({
 }) {
   const { booting, products } = useCatalogGate();
   const [activeCat, setActiveCat] = useState<CategoryKey>('popular');
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const data = useMemo(() => {
-    if (activeCat === 'popular') return products;
-    return products.filter((item) => item.category === activeCat);
-  }, [activeCat, products]);
+    let filtered = activeCat === 'popular' ? products : products.filter((item) => item.category === activeCat);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      filtered = products.filter((item) => item.title.toLowerCase().includes(q));
+    }
+    return filtered;
+  }, [activeCat, products, searchQuery]);
 
   const screenW = Dimensions.get('window').width;
   const gap = 18;
@@ -113,9 +119,42 @@ export default function HomeScreen({
     <SafeAreaView className="flex-1 bg-white">
       {/* Top */}
       <View className="px-6 pt-4">
-        <Pressable onPress={onSearch} hitSlop={12} className="h-12 w-12 justify-center">
-          <Ionicons name="search-outline" size={34} color={COLORS.primary} />
-        </Pressable>
+        {showSearch ? (
+          <View className="flex-row items-center">
+            <View className="flex-1 flex-row items-center rounded-xl bg-gray-100 px-4">
+              <Ionicons name="search-outline" size={20} color={COLORS.muted} />
+              <TextInput
+                className="ml-2 flex-1 py-3 text-[18px]"
+                style={{ color: COLORS.text }}
+                placeholder="Search furniture..."
+                placeholderTextColor={COLORS.muted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus
+              />
+              {searchQuery.length > 0 && (
+                <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+                  <Ionicons name="close-circle" size={20} color={COLORS.muted} />
+                </Pressable>
+              )}
+            </View>
+            <Pressable
+              onPress={() => {
+                setShowSearch(false);
+                setSearchQuery('');
+              }}
+              hitSlop={12}
+              className="ml-3">
+              <Text className="text-[18px] font-medium" style={{ color: COLORS.primary }}>
+                Cancel
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable onPress={() => setShowSearch(true)} hitSlop={12} className="h-12 w-12 justify-center">
+            <Ionicons name="search-outline" size={34} color={COLORS.primary} />
+          </Pressable>
+        )}
       </View>
 
       {/* Categories */}
